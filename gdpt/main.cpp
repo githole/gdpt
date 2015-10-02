@@ -30,18 +30,18 @@ int render(const char *filename, const int width, const int height, const int nu
     omp_set_num_threads(num_thread);
 #endif // _OPENMP
     
-    // ƒJƒƒ‰ˆÊ’uB
+    // ã‚«ãƒ¡ãƒ©ä½ç½®ã€‚
     const Vec camera_position = Vec(7.0, 3.0, 7.0);
     const Vec camera_lookat   = Vec(0.0, 1.5, 0.0);
     const Vec camera_dir      = normalize(camera_lookat - camera_position);
     const Vec camera_up       = Vec(0.0, 1.0, 0.0);
 
-    // ƒ[ƒ‹ƒhÀ•WŒn‚Å‚ÌƒCƒ[ƒWƒZƒ“ƒT[‚Ì‘å‚«‚³B
-    const double sensor_width = 30.0 * width / height; // ƒAƒXƒyƒNƒg”ä’²®B
+    // ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã§ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚»ãƒ³ã‚µãƒ¼ã®å¤§ãã•ã€‚
+    const double sensor_width = 30.0 * width / height; // ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”èª¿æ•´ã€‚
     const double sensor_height= 30.0;
-    // ƒCƒ[ƒWƒZƒ“ƒT[‚Ü‚Å‚Ì‹——£B
+    // ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚»ãƒ³ã‚µãƒ¼ã¾ã§ã®è·é›¢ã€‚
     const double sensor_dist  = 45.0;
-    // ƒCƒ[ƒWƒZƒ“ƒT[‚ğ’£‚éƒxƒNƒgƒ‹B
+    // ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚»ãƒ³ã‚µãƒ¼ã‚’å¼µã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã€‚
     const Vec sensor_x_vec = normalize(cross(camera_dir, camera_up)) * sensor_width;
     const Vec sensor_y_vec = normalize(cross(sensor_x_vec, camera_dir)) * sensor_height;
     const Vec sensor_center = camera_position + camera_dir * sensor_dist;
@@ -68,13 +68,13 @@ int render(const char *filename, const int width, const int height, const int nu
                 double sx = random.next01();
                 double sy = random.next01();
                 
-                // ƒCƒ[ƒWƒZƒ“ƒT[ã‚ÌˆÊ’uB
+                // ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚»ãƒ³ã‚µãƒ¼ä¸Šã®ä½ç½®ã€‚
                 const Vec position_on_sensor = 
                     sensor_center + 
                     sensor_x_vec * ((sx + x) / width - 0.5) +
                     sensor_y_vec * ((sy + y) / height- 0.5);
                 
-                // ƒŒƒC‚ğ”ò‚Î‚·•ûŒüB
+                // ãƒ¬ã‚¤ã‚’é£›ã°ã™æ–¹å‘ã€‚
                 const Vec dir = normalize(position_on_sensor - camera_position);
 
                 accumulated_radiance +=
@@ -85,7 +85,7 @@ int render(const char *filename, const int width, const int height, const int nu
     }
     std::cout << std::endl;
     
-    // o—Í
+    // å‡ºåŠ›
 //    save_ppm_file(filename, image, width, height);
 
     char buf[256];
@@ -120,39 +120,39 @@ struct Vertex {
 Color radiance_gpt(const Ray &ray, Random &random, const int depth, double *path_pdf, std::vector<Vertex> *verts) {
     const Color kBackgroundColor = Color(0.0f, 0.0f, 0.0f);
     const int kDepthLimit = 4;
-    // ‘Å‚¿Ø‚èƒ`ƒFƒbƒN
+    // æ‰“ã¡åˆ‡ã‚Šãƒã‚§ãƒƒã‚¯
     if (depth >= kDepthLimit)
         return Color();
     
-    // ƒV[ƒ“‚ÆŒğ·”»’è
+    // ã‚·ãƒ¼ãƒ³ã¨äº¤å·®åˆ¤å®š
     Hitpoint hitpoint;
     const SceneSphere *now_object = intersect_scene(ray, &hitpoint);
-    // Œğ·ƒ`ƒFƒbƒN
+    // äº¤å·®ãƒã‚§ãƒƒã‚¯
     if (now_object == NULL)
         return kBackgroundColor;
 
-    // ƒ}ƒeƒŠƒAƒ‹æ“¾
+    // ãƒãƒ†ãƒªã‚¢ãƒ«å–å¾—
     const Material *now_material = now_object->get_material();
 
     const Color emission = now_material->emission();
     if (emission.x > 0.0 || emission.y > 0.0 || emission.z > 0.0) {
-        // ŒõŒ¹‚ÅI‚í‚è‚È‚Ì‚Åhalf-vector’è‹`‚Å‚«‚È‚¢
+        // å…‰æºã§çµ‚ã‚ã‚Šãªã®ã§half-vectorå®šç¾©ã§ããªã„
         verts->push_back(Vertex(hitpoint.position, hitpoint.normal, now_material, Vec(0, 0, 0), now_object));
 
-        // ŒõŒ¹‚Éƒqƒbƒg‚µ‚½‚ç•úË€‚¾‚¯•Ô‚µ‚ÄI‚í‚éB
-        // i¡‰ñAŒõŒ¹‚Í”½Ë—¦0‚Æ‰¼’è‚µ‚Ä‚¢‚é‚½‚ßj
+        // å…‰æºã«ãƒ’ãƒƒãƒˆã—ãŸã‚‰æ”¾å°„é …ã ã‘è¿”ã—ã¦çµ‚ã‚ã‚‹ã€‚
+        // ï¼ˆä»Šå›ã€å…‰æºã¯åå°„ç‡0ã¨ä»®å®šã—ã¦ã„ã‚‹ãŸã‚ï¼‰
         return emission;
     }
     
-    // Ÿ‚Ì•ûŒü‚ğƒTƒ“ƒvƒŠƒ“ƒOB
-    // BRDF‚Ì’lB
+    // æ¬¡ã®æ–¹å‘ã‚’ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã€‚
+    // BRDFã®å€¤ã€‚
     Color brdf_eval;
     double pdf = -1;
     const Vec dir_out = now_material->sample(random, ray.dir, hitpoint.normal, &pdf, &brdf_eval);
 
     //brdf_eval=now_material->eval(ray.dir, hitpoint.normal, dir_out);
 
-    const Vec now_normal = dot(hitpoint.normal, ray.dir) < 0.0 ? hitpoint.normal: -hitpoint.normal; // Œğ·ˆÊ’u‚Ì–@üi•¨‘Ì‚©‚ç‚ÌƒŒƒC‚Ì“üo‚ğl—¶B
+    const Vec now_normal = dot(hitpoint.normal, ray.dir) < 0.0 ? hitpoint.normal: -hitpoint.normal; // äº¤å·®ä½ç½®ã®æ³•ç·šï¼ˆç‰©ä½“ã‹ã‚‰ã®ãƒ¬ã‚¤ã®å…¥å‡ºã‚’è€ƒæ…®ã€‚
     const ReflectionType reflection_type = dot(now_normal, dir_out) > 0.0 ? Reflection : Refraction;
     
     if (now_object->get_sphere()->position().y < -1000) {
@@ -169,16 +169,16 @@ Color radiance_gpt(const Ray &ray, Random &random, const int depth, double *path
        */
     }
 
-    // ’¸“_—ñ\’z
+    // é ‚ç‚¹åˆ—æ§‹ç¯‰
     const Vec half = normalize(normalize(-ray.dir) + normalize(dir_out));
     verts->push_back(Vertex(hitpoint.position, hitpoint.normal, now_material, half, now_object, dir_out, reflection_type));
 
-    // cos€B
+    // cosé …ã€‚
     const double cost = dot(hitpoint.normal, dir_out);
 
     *path_pdf *= pdf;
 
-    // ƒŒƒ“ƒ_ƒŠƒ“ƒO•û’ö®‚ğƒ‚ƒ“ƒeƒJƒ‹ƒÏ•ª‚É‚æ‚Á‚ÄÄ‹A“I‚É‰ğ‚­B
+    // ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°æ–¹ç¨‹å¼ã‚’ãƒ¢ãƒ³ãƒ†ã‚«ãƒ«ãƒ­ç©åˆ†ã«ã‚ˆã£ã¦å†å¸°çš„ã«è§£ãã€‚
     Color L = multiply(brdf_eval, radiance_gpt(Ray(hitpoint.position, dir_out),random, depth + 1, path_pdf, verts));
     L *= cost;
     return L;
@@ -208,7 +208,7 @@ enum Result {
 };
 
 Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vector<Vertex> *offsetVertices, Color *f, double *J, double *sub_pdf) {
-    // ‚¢‚«‚È‚èŒõŒ¹‚Éƒqƒbƒg or ‚¢‚«‚È‚èŠO‚Ö”ò‚ñ‚Ås‚Á‚½‚çnot invertible‚Æ‚¢‚¤‚±‚Æ‚É‚µ‚Änaive‚ÉgradientŒvZ‚·‚é
+    // ã„ããªã‚Šå…‰æºã«ãƒ’ãƒƒãƒˆ or ã„ããªã‚Šå¤–ã¸é£›ã‚“ã§è¡Œã£ãŸã‚‰not invertibleã¨ã„ã†ã“ã¨ã«ã—ã¦naiveã«gradientè¨ˆç®—ã™ã‚‹
     if (baseVertices.size() <= 2) 
         return NotInveritble;
 
@@ -218,14 +218,14 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
         const SceneSphere *now_object = intersect_scene(ray, &hitpoint);
         if (now_object == NULL)
             return NotInveritble;
-        offsetVertices->push_back(Vertex(hitpoint.position, hitpoint.normal, now_object->get_material(), Vec(), now_object)); // offset-path‚Å‚Íhalf-vectorg‚í‚È‚¢‚Ì‚Å0‚ğ“ü‚ê‚é
+        offsetVertices->push_back(Vertex(hitpoint.position, hitpoint.normal, now_object->get_material(), Vec(), now_object)); // offset-pathã§ã¯half-vectorä½¿ã‚ãªã„ã®ã§0ã‚’å…¥ã‚Œã‚‹
     }
     
     *J = 1;
     *sub_pdf = 1;
     *f = Color(1, 1, 1);
 
-    int index = 1; // index = 0 ‚ÍƒJƒƒ‰ˆÊ’u
+    int index = 1; // index = 0 ã¯ã‚«ãƒ¡ãƒ©ä½ç½®
     // (ii) Tracing Additional Segments
     for (;;++index) {
         if (!check_same_material(baseVertices[index].material, (*offsetVertices)[index].material)){
@@ -233,22 +233,22 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
         }
         
         if (index + 1 == baseVertices.size() && !is_lightsource(baseVertices[index].material)) {
-            // ŒõŒ¹‚É“’B‚µ‚È‚¢‚Å“r’†‚Å‘Å‚¿Ø‚ç‚ê‚éƒpƒX‚Å‚ ‚Á‚½
+            // å…‰æºã«åˆ°é”ã—ãªã„ã§é€”ä¸­ã§æ‰“ã¡åˆ‡ã‚‰ã‚Œã‚‹ãƒ‘ã‚¹ã§ã‚ã£ãŸ
             return NotInveritble;
         }
 
         if (is_specular(baseVertices[index].material) || (index + 1 < baseVertices.size() && is_specular(baseVertices[index + 1].material))) {
-            // half-vectorƒRƒs[
+            // half-vectorã‚³ãƒ”ãƒ¼
 
-            // refraction -> internal reflectionƒ`ƒFƒbƒN
+            // refraction -> internal reflectionãƒã‚§ãƒƒã‚¯
 
-            // ‚ß‚ñ‚Ç‚¢‚Ì‚Å‚¿‚å‚Á‚ÆŠÈˆÕ“I‚ÈÀ‘•‚É‚·‚é‚æ
+            // ã‚ã‚“ã©ã„ã®ã§ã¡ã‚‡ã£ã¨ç°¡æ˜“çš„ãªå®Ÿè£…ã«ã™ã‚‹ã‚ˆ
             Vec dir_out;
 
             ReflectionType reflection_type;
 
             if (is_diffuse(baseVertices[index].material)) {
-                // half-vectorƒRƒs[
+                // half-vectorã‚³ãƒ”ãƒ¼
                 const Vec now_half = baseVertices[index].half;
                 const Vec in_dir = normalize((*offsetVertices)[index].position - (*offsetVertices)[index - 1].position);
                 const double A = dot(now_half, -in_dir);
@@ -257,8 +257,8 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
 
                 reflection_type = Reflection;
             } else {
-                // ƒXƒyƒLƒ…ƒ‰‚Å‚ ‚Á‚½‚Ì‚ÅA•’Ê‚ÉƒXƒyƒLƒ…ƒ‰ˆ—‚·‚é
-                // Š®‘SƒXƒyƒLƒ…ƒ‰‚¾‚¯‰¼’è‚·‚é
+                // ã‚¹ãƒšã‚­ãƒ¥ãƒ©ã§ã‚ã£ãŸã®ã§ã€æ™®é€šã«ã‚¹ãƒšã‚­ãƒ¥ãƒ©å‡¦ç†ã™ã‚‹
+                // å®Œå…¨ã‚¹ãƒšã‚­ãƒ¥ãƒ©ã ã‘ä»®å®šã™ã‚‹
                 const GlassMaterial *glass = dynamic_cast<const GlassMaterial*>(baseVertices[index].material);
 
                 Vec reflection_dir;
@@ -271,7 +271,7 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
                     // not invertible
                     return NotInveritble;
                 }
-                // baseƒpƒX‚Ì”½ËE‹üÜ‚É‚»‚ë‚¦‚é
+                // baseãƒ‘ã‚¹ã®åå°„ãƒ»å±ˆæŠ˜ã«ãã‚ãˆã‚‹
                 if (baseVertices[index].reflection_type == Reflection) {
                     dir_out = reflection_dir;
                     reflection_type = Reflection;
@@ -281,16 +281,16 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
                 }
             }
 
-            // Ÿ‚Ìoffset’¸“_‚ÖŒü‚©‚Á‚ÄƒŒƒC”ò‚Î‚·
+            // æ¬¡ã®offseté ‚ç‚¹ã¸å‘ã‹ã£ã¦ãƒ¬ã‚¤é£›ã°ã™
             {
                 Hitpoint hitpoint;
                 const SceneSphere *now_object = intersect_scene(Ray((*offsetVertices)[index].position, dir_out), &hitpoint);
                 if (now_object == NULL)
                     return NotInveritble;
                 
-                offsetVertices->push_back(Vertex(hitpoint.position, hitpoint.normal, now_object->get_material(), Vec(), now_object)); // offset-path‚Å‚Íhalf-vectorg‚í‚È‚¢‚Ì‚Å0‚ğ“ü‚ê‚é
+                offsetVertices->push_back(Vertex(hitpoint.position, hitpoint.normal, now_object->get_material(), Vec(), now_object)); // offset-pathã§ã¯half-vectorä½¿ã‚ãªã„ã®ã§0ã‚’å…¥ã‚Œã‚‹
 
-                // ƒ„ƒRƒrƒAƒ“ŒvZ
+                // ãƒ¤ã‚³ãƒ“ã‚¢ãƒ³è¨ˆç®—
                 const Vec omega_o_x = normalize(baseVertices[index - 1].position - baseVertices[index].position);
                 const Vec omega_i_x = normalize(baseVertices[index + 1].position - baseVertices[index].position);
                 const Vec omega_o_y = normalize((*offsetVertices)[index - 1].position - (*offsetVertices)[index].position);
@@ -310,21 +310,21 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
 
                     double n1_x, n2_x, n1_y, n2_y;
                     if (dot(normal_x, -omega_o_x) < 0.0) {
-                        // ŠO‚©‚ç’†‚É“ü‚Á‚Ä‚­‚é
+                        // å¤–ã‹ã‚‰ä¸­ã«å…¥ã£ã¦ãã‚‹
                         n1_x = 1;
                         n2_x = glass_x->ior();
                     } else {
-                        // ’†‚©‚çŠO‚É“ü‚Á‚Ä‚­‚é
+                        // ä¸­ã‹ã‚‰å¤–ã«å…¥ã£ã¦ãã‚‹
                         n2_x = 1;
                         n1_x = glass_x->ior();
                     }
                     
                     if (dot(normal_y, -omega_o_y) < 0.0) {
-                        // ŠO‚©‚ç’†‚É“ü‚Á‚Ä‚­‚é
+                        // å¤–ã‹ã‚‰ä¸­ã«å…¥ã£ã¦ãã‚‹
                         n1_y = 1;
                         n2_y = glass_y->ior();
                     } else {
-                        // ’†‚©‚çŠO‚É“ü‚Á‚Ä‚­‚é
+                        // ä¸­ã‹ã‚‰å¤–ã«å…¥ã£ã¦ãã‚‹
                         n2_y = 1;
                         n1_y = glass_y->ior();
                     }
@@ -342,29 +342,29 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
         } else {
 
             if (index + 1 < baseVertices.size()) {
-                // Œ»İ‚ÆŸ‚Ìbase’¸“_ƒ}ƒeƒŠƒAƒ‹‚ªdiffuse
-                // ‚±‚Ì‚Æ‚«AŒ»İ‚Ìoffset’¸“_‚àdiffuse‚É‚È‚Á‚Ä‚é‚Í‚¸
+                // ç¾åœ¨ã¨æ¬¡ã®baseé ‚ç‚¹ãƒãƒ†ãƒªã‚¢ãƒ«ãŒdiffuse
+                // ã“ã®ã¨ãã€ç¾åœ¨ã®offseté ‚ç‚¹ã‚‚diffuseã«ãªã£ã¦ã‚‹ã¯ãš
                 // Reconnect
                 const Vec next_offset_position = baseVertices[index + 1].position;
                 const Vec now_offset_position = (*offsetVertices)[index].position;
 
-                // occlude”»’è
+                // occludeåˆ¤å®š
                 Hitpoint th;
                 const SceneSphere *s = intersect_scene(Ray(now_offset_position, normalize(next_offset_position - now_offset_position)), &th);
                 const Vec real_next_offset_position = th.position;
 
                 if ((real_next_offset_position - next_offset_position).length_squared() > 1e-3) {
-                    // occlude‚³‚ê‚½!
+                    // occludeã•ã‚ŒãŸ!
                     return NotSymmetric;
                 }
 
-                // –³–offset‚ªbaseƒpƒX‚É‡—¬
-                // c‚è‚Ì’¸“_‘S•”ƒRƒs[
+                // ç„¡äº‹offsetãŒbaseãƒ‘ã‚¹ã«åˆæµ
+                // æ®‹ã‚Šã®é ‚ç‚¹å…¨éƒ¨ã‚³ãƒ”ãƒ¼
                 for (int i = index + 1; i < baseVertices.size(); ++i) {
                     offsetVertices->push_back(baseVertices[i]);
                 }
         
-                // ÅŒã‚Ìƒ„ƒRƒrƒAƒ“‚ÌdetAJŒvZ‚·‚é
+                // æœ€å¾Œã®ãƒ¤ã‚³ãƒ“ã‚¢ãƒ³ã®detã€Jè¨ˆç®—ã™ã‚‹
                 {
                     const Vec X_1y = now_offset_position;
                     const Vec X_2y = next_offset_position;
@@ -378,11 +378,11 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
                     
                 }
             } else {
-                // offset-path‚ªÅŒã‚Ü‚Åbase‚É‡—¬‚µ‚È‚©‚Á‚½‚Æ‚«‚É‚­‚éB
+                // offset-pathãŒæœ€å¾Œã¾ã§baseã«åˆæµã—ãªã‹ã£ãŸã¨ãã«ãã‚‹ã€‚
             }
 
-            // ƒpƒX‚ªReconnect‚³‚ê‚½‚Í‚¸‚È‚Ì‚ÅƒXƒ‹[ƒvƒbƒgf(y)‚ğŒvZ‚µ‚ÄI—¹‚·‚é
-            // ˆê‚Épdf‚àŒvZ‚·‚é
+            // ãƒ‘ã‚¹ãŒReconnectã•ã‚ŒãŸã¯ãšãªã®ã§ã‚¹ãƒ«ãƒ¼ãƒ—ãƒƒãƒˆf(y)ã‚’è¨ˆç®—ã—ã¦çµ‚äº†ã™ã‚‹
+            // ä¸€ç·’ã«pdfã‚‚è¨ˆç®—ã™ã‚‹
             Color f_subpath(1, 1, 1);
             double pdf = 1;
             bool debug = false;
@@ -395,7 +395,7 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
                     if (i + 1 >= offsetVertices->size())
                         f_subpath = multiply(f_subpath, emission);
                     else
-                        f_subpath = Color(); // ŒõŒ¹‚Ì”½Ë—¦‚Í0‚ğ‰¼’è‚µ‚Ä‚¢‚é‚½‚ßA“r’†‚ÅŒõŒ¹‚Éƒqƒbƒg‚µ‚½ê‡ƒXƒ‹[ƒvƒbƒg‚Í0
+                        f_subpath = Color(); // å…‰æºã®åå°„ç‡ã¯0ã‚’ä»®å®šã—ã¦ã„ã‚‹ãŸã‚ã€é€”ä¸­ã§å…‰æºã«ãƒ’ãƒƒãƒˆã—ãŸå ´åˆã‚¹ãƒ«ãƒ¼ãƒ—ãƒƒãƒˆã¯0
                     break;
                 }
 
@@ -415,7 +415,7 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
 //                        std::cout << "*";
                     }
 
-                    Color brdf_eval = v.material->eval(in_dir, normal, dir_out); // Fr, Ft‚Í”²‚©‚ê‚Ä‚¢‚é
+                    Color brdf_eval = v.material->eval(in_dir, normal, dir_out); // Fr, Ftã¯æŠœã‹ã‚Œã¦ã„ã‚‹
                     const GlassMaterial *glass = dynamic_cast<const GlassMaterial*>(v.material);
 
                     Vec reflection_dir;
@@ -426,7 +426,7 @@ Result shift(const std::vector<Vertex> &baseVertices, const Ray &ray, std::vecto
                     const Vec now_normal = dot(normal, in_dir) < 0.0 ? normal: -normal; 
                     const double cost = dot(normal, dir_out);
                     
-                    const double probability  = Fr; // GlassMaterial‚©‚ç‚Ìƒ}ƒWƒbƒNƒiƒ“ƒo[
+                    const double probability  = Fr; // GlassMaterialã‹ã‚‰ã®ãƒã‚¸ãƒƒã‚¯ãƒŠãƒ³ãƒãƒ¼
                     if (dot(now_normal, dir_out) > 0.0) {
                         // reflection
                         f_subpath = multiply(f_subpath, cost * brdf_eval * Fr);
@@ -477,18 +477,18 @@ void render_gpt(const char *filename, const int width, const int height, const i
     omp_set_num_threads(num_thread);
 #endif
 
-    // ƒJƒƒ‰ˆÊ’uB
+    // ã‚«ãƒ¡ãƒ©ä½ç½®ã€‚
     const Vec camera_position = Vec(7.0, 3.0, 7.0);
     const Vec camera_lookat   = Vec(0.0, 1.5, 0.0);
     const Vec camera_dir      = normalize(camera_lookat - camera_position);
     const Vec camera_up       = Vec(0.0, 1.0, 0.0);
 
-    // ƒ[ƒ‹ƒhÀ•WŒn‚Å‚ÌƒCƒ[ƒWƒZƒ“ƒT[‚Ì‘å‚«‚³B
-    const double sensor_width = 30.0 * width / height; // ƒAƒXƒyƒNƒg”ä’²®B
+    // ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã§ã®ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚»ãƒ³ã‚µãƒ¼ã®å¤§ãã•ã€‚
+    const double sensor_width = 30.0 * width / height; // ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”èª¿æ•´ã€‚
     const double sensor_height= 30.0;
-    // ƒCƒ[ƒWƒZƒ“ƒT[‚Ü‚Å‚Ì‹——£B
+    // ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚»ãƒ³ã‚µãƒ¼ã¾ã§ã®è·é›¢ã€‚
     const double sensor_dist  = 45.0;
-    // ƒCƒ[ƒWƒZƒ“ƒT[‚ğ’£‚éƒxƒNƒgƒ‹B
+    // ã‚¤ãƒ¡ãƒ¼ã‚¸ã‚»ãƒ³ã‚µãƒ¼ã‚’å¼µã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã€‚
     const Vec sensor_x_vec = normalize(cross(camera_dir, camera_up)) * sensor_width;
     const Vec sensor_y_vec = normalize(cross(sensor_x_vec, camera_dir)) * sensor_height;
     const Vec sensor_center = camera_position + camera_dir * sensor_dist;
@@ -559,9 +559,9 @@ void render_gpt(const char *filename, const int width, const int height, const i
                     Result result = shift(baseVertices, Ray(camera_position, dir), &offsetVertices[offsetDir], &f_subpath, &J, &subPathPDF);
                     Color accum;
                     if (result == Result::NotInveritble) {
-                        // naive‚Égradient‹‚ß‚éI
+                        // naiveã«gradientæ±‚ã‚ã‚‹ï¼
                         std::vector<Vertex> tmp;
-                        subPathPDF = 1; // ‰Šú‰»
+                        subPathPDF = 1; // åˆæœŸåŒ–
                         f_subpath = radiance_gpt(Ray(camera_position, dir), random, 0, &subPathPDF, &tmp);
                         accum = f_base / basePathPDF - f_subpath / subPathPDF;
                     } else if (result == Result::Invertible) {
@@ -573,7 +573,7 @@ void render_gpt(const char *filename, const int width, const int height, const i
                         accum = w_ij * f_base / basePathPDF;
                     }
                     
-                    // ‘O•û·•ª or Œã•û·•ª
+                    // å‰æ–¹å·®åˆ† or å¾Œæ–¹å·®åˆ†
                     if (offsetDir == 1 || offsetDir == 2)
                         diff_image[offsetDir][image_index] += accum;
                     else
@@ -590,7 +590,7 @@ void render_gpt(const char *filename, const int width, const int height, const i
     }
     std::cout << std::endl;
 
-    // ˆÈ‰ºAŠeíƒoƒbƒtƒ@‚ğ‰æ‘œ‚Æ‚µ‚Äo—Í
+    // ä»¥ä¸‹ã€å„ç¨®ãƒãƒƒãƒ•ã‚¡ã‚’ç”»åƒã¨ã—ã¦å‡ºåŠ›
     char buf[256];
     char name[4][256] = {
         "__1_0",
@@ -631,7 +631,7 @@ int main() {
     // const int sample = 8192;
     const int nthread = 8;
     //gemspt::render("output/reference", width, height, sample, nthread,  0, 0, 0);
-#if 1
+#if 0
     {
         const int sample = 8192;
         Timer timer;
@@ -667,7 +667,7 @@ int main() {
     fclose(fp);
 #endif
 
-#if 0
+#if 1
     int sample_table[] = {
         4,
         16,
@@ -682,12 +682,12 @@ int main() {
         const int sample = sample_table[i];
 
         char buf[256];
-        sprintf(buf, "lfreq/result2_%03ds", sample);
+        sprintf(buf, "output/result2_%03ds", sample);
         gemspt::render_gpt(buf, width, height, sample, nthread, 0);
 
 
         const float sec = timer.end() / 1000.0f;
-        sprintf(buf, "lfreq/result2_%03ds_log.txt", sample);
+        sprintf(buf, "output/result2_%03ds_log.txt", sample);
         FILE *fp = fopen(buf, "wt");
         fprintf(fp, "%f sec", sec);
         fclose(fp);
